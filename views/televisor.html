@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Televisor - Sistema de Ventas</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+        }
+
+        .table {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .thead-dark {
+            background-color: #333;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid mt-4">
+        <h1 class="text-center">Ventas en Tiempo Real</h1>
+        <table class="table table-bordered mt-4">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Agente</th>
+                    <th>Ventas Diarias</th>
+                    <th>Ventas Semanales</th>
+                    <th>Ventas Mensuales</th>
+                    <th>Target</th>
+                </tr>
+            </thead>
+            <tbody id="televisorTableBody">
+                <!-- Datos cargados dinámicamente -->
+            </tbody>
+        </table>
+    </div>
+    <script>
+        async function loadTelevisorData() {
+            try {
+                const response = await fetch('http://localhost:3000/agents');
+                const agents = await response.json();
+                const tableBody = document.getElementById('televisorTableBody');
+                tableBody.innerHTML = '';
+                agents.forEach(agent => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+            <td>${agent.name}</td>
+            <td>$${agent.sales.daily}</td>
+            <td>$${agent.sales.weekly}</td>
+            <td>$${agent.sales.monthly}</td>
+            <td>$${agent.target}</td>
+          `;
+                    tableBody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('Error al cargar datos del televisor:', error);
+            }
+        }
+        // Actualizar la vista cada 5 segundos para simular tiempo real
+        loadTelevisorData();
+        setInterval(loadTelevisorData, 5000);
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

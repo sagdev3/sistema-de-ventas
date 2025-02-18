@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Panel de Administración - Sistema de Ventas</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+
+<body>
+    <!-- Barra de navegación -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <a class="navbar-brand" href="#">Sistema de Ventas</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="televisor.html" target="_blank">Ver Televisor</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="login.html">Cerrar Sesión</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h1>Panel de Administración</h1>
+        <p>Gestiona tus agentes y ventas.</p>
+
+        <h3>Gestión de Agentes</h3>
+        <div id="alert" class="alert d-none"></div>
+        <table class="table table-bordered">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                    <th>Ventas Diarias</th>
+                    <th>Ventas Semanales</th>
+                    <th>Ventas Mensuales</th>
+                    <th>Target (Ventas mensuales)</th>
+                    <th>Total Dinero Mensual</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="agentTableBody"></tbody>
+        </table>
+
+        <h3>Agregar Agente</h3>
+        <form id="addAgentForm">
+            <div class="form-group">
+                <label for="agentName">Nombre</label>
+                <input type="text" class="form-control" id="agentName" required>
+            </div>
+            <div class="form-group">
+                <label for="agentEmail">Email</label>
+                <input type="email" class="form-control" id="agentEmail" required>
+            </div>
+            <div class="form-group">
+                <label for="agentTarget">Target (Ventas mensuales)</label>
+                <input type="number" class="form-control" id="agentTarget" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Agregar Agente</button>
+        </form>
+    </div>
+
+    <!-- Modal para registrar venta -->
+    <div class="modal fade" id="saleModal" tabindex="-1" role="dialog" aria-labelledby="saleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="saleModalLabel">Registrar Venta</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="saleForm">
+                        <input type="hidden" id="saleAgentId">
+                        <div class="form-group">
+                            <label for="saleAmount">Monto de la Venta</label>
+                            <input type="number" class="form-control" id="saleAmount" step="0.01" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="saveSaleButton">Registrar Venta</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para restar venta -->
+    <div class="modal fade" id="subtractSaleModal" tabindex="-1" role="dialog" aria-labelledby="subtractSaleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="subtractSaleModalLabel">Restar Venta</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Seleccione la venta a restar para el agente:</p>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Monto</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="salesListBody"></tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para editar agente -->
+    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editModalLabel">Editar Agente</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="editAgentForm">
+                        <input type="hidden" id="editAgentId">
+                        <div class="form-group">
+                            <label for="editAgentName">Nombre</label>
+                            <input type="text" class="form-control" id="editAgentName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editAgentEmail">Email</label>
+                            <input type="email" class="form-control" id="editAgentEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editAgentTarget">Target (Ventas mensuales)</label>
+                            <input type="number" class="form-control" id="editAgentTarget" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="saveEditButton">Guardar cambios</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function loadAgents() {
+            try {
+                const response = await fetch('http://localhost:3000/agents');
+                const agents = await response.json();
+                const tableBody = document.getElementById('agentTableBody');
+                tableBody.innerHTML = '';
+                agents.forEach(agent => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+            <td>${agent.name}</td>
+            <td>${agent.email || ''}</td>
+            <td>${agent.sales.daily}</td>
+            <td>${agent.sales.weekly}</td>
+            <td>${agent.sales.monthly}</td>
+            <td>${agent.target}</td>
+            <td>${agent.moneyMonthly ? agent.moneyMonthly.toFixed(2) : "0.00"}</td>
+            <td>
+              <button class="btn btn-sm btn-success" onclick="openSaleModal('${agent._id}')">Registrar Venta</button>
+              <button class="btn btn-sm btn-warning" onclick="openSubtractModal('${agent._id}')">Restar Venta</button>
+              <button class="btn btn-sm btn-secondary" onclick="openEditModal('${agent._id}', '${agent.name}', '${agent.email}', '${agent.target}')">Editar</button>
+              <button class="btn btn-sm btn-danger" onclick="deleteAgent('${agent._id}')">Eliminar</button>
+            </td>
+          `;
+                    tableBody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('Error al cargar agentes:', error);
+            }
+        }
+
+        function openSaleModal(agentId) {
+            document.getElementById('saleAgentId').value = agentId;
+            document.getElementById('saleAmount').value = "";
+            $('#saleModal').modal('show');
+        }
+
+        document.getElementById('saveSaleButton').addEventListener('click', async function () {
+            const agentId = document.getElementById('saleAgentId').value;
+            const amount = parseFloat(document.getElementById('saleAmount').value);
+            if (!agentId || isNaN(amount)) {
+                showAlert('Ingrese un monto válido', 'danger');
+                return;
+            }
+            try {
+                const response = await fetch('http://localhost:3000/sales', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ agentId, amount })
+                });
+                if (response.ok) {
+                    showAlert('Venta registrada exitosamente', 'success');
+                    $('#saleModal').modal('hide');
+                    loadAgents();
+                } else {
+                    const data = await response.json();
+                    showAlert(data.error || 'Error al registrar venta', 'danger');
+                }
+            } catch (error) {
+                showAlert('Error en la conexión', 'danger');
+            }
+        });
+
+        async function openSubtractModal(agentId) {
+            try {
+                const now = new Date();
+                const month = now.getMonth() + 1;
+                const year = now.getFullYear();
+                const response = await fetch(`http://localhost:3000/sales/agent/${agentId}?month=${month}&year=${year}`);
+                const sales = await response.json();
+                const salesListBody = document.getElementById('salesListBody');
+                salesListBody.innerHTML = '';
+                if (sales.length === 0) {
+                    salesListBody.innerHTML = '<tr><td colspan="3">No hay ventas registradas para este mes.</td></tr>';
+                } else {
+                    sales.forEach(sale => {
+                        const tr = document.createElement('tr');
+                        const saleDate = new Date(sale.date).toLocaleDateString();
+                        tr.innerHTML = `
+              <td>${saleDate}</td>
+              <td>${sale.amount.toFixed(2)}</td>
+              <td><button class="btn btn-sm btn-danger" onclick="subtractSale('${sale._id}')">Restar</button></td>
+            `;
+                        salesListBody.appendChild(tr);
+                    });
+                }
+                $('#subtractSaleModal').modal('show');
+            } catch (error) {
+                showAlert('Error al cargar ventas', 'danger');
+                console.error('Error al cargar ventas:', error);
+            }
+        }
+
+        async function subtractSale(saleId) {
+            try {
+                const response = await fetch('http://localhost:3000/sales/subtract', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ saleId })
+                });
+                if (response.ok) {
+                    showAlert('Venta restada exitosamente', 'success');
+                    $('#subtractSaleModal').modal('hide');
+                    loadAgents();
+                } else {
+                    const data = await response.json();
+                    showAlert(data.error || 'Error al restar venta', 'danger');
+                }
+            } catch (error) {
+                showAlert('Error en la conexión', 'danger');
+            }
+        }
+
+        document.getElementById('addAgentForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const name = document.getElementById('agentName').value;
+            const email = document.getElementById('agentEmail').value;
+            const target = document.getElementById('agentTarget').value;
+            try {
+                const response = await fetch('http://localhost:3000/agents', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, target })
+                });
+                if (response.ok) {
+                    showAlert('Agente agregado exitosamente', 'success');
+                    loadAgents();
+                    document.getElementById('addAgentForm').reset();
+                } else {
+                    const data = await response.json();
+                    showAlert(data.error || 'Error al agregar agente', 'danger');
+                }
+            } catch (error) {
+                showAlert('Error en la conexión', 'danger');
+            }
+        });
+
+        function openEditModal(id, name, email, target) {
+            document.getElementById('editAgentId').value = id;
+            document.getElementById('editAgentName').value = name;
+            document.getElementById('editAgentEmail').value = email;
+            document.getElementById('editAgentTarget').value = target;
+            $('#editModal').modal('show');
+        }
+
+        document.getElementById('saveEditButton').addEventListener('click', async function () {
+            const id = document.getElementById('editAgentId').value;
+            const name = document.getElementById('editAgentName').value;
+            const email = document.getElementById('editAgentEmail').value;
+            const target = document.getElementById('editAgentTarget').value;
+            try {
+                const response = await fetch('http://localhost:3000/agents/' + id, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, target })
+                });
+                if (response.ok) {
+                    showAlert('Agente actualizado exitosamente', 'success');
+                    $('#editModal').modal('hide');
+                    loadAgents();
+                } else {
+                    const data = await response.json();
+                    showAlert(data.error || 'Error al actualizar agente', 'danger');
+                }
+            } catch (error) {
+                showAlert('Error en la conexión', 'danger');
+            }
+        });
+
+        async function deleteAgent(id) {
+            if (!confirm('¿Estás seguro de eliminar este agente?')) return;
+            try {
+                const response = await fetch('http://localhost:3000/agents/' + id, { method: 'DELETE' });
+                if (response.ok) {
+                    showAlert('Agente eliminado exitosamente', 'success');
+                    loadAgents();
+                } else {
+                    const data = await response.json();
+                    showAlert(data.error || 'Error al eliminar agente', 'danger');
+                }
+            } catch (error) {
+                showAlert('Error en la conexión', 'danger');
+            }
+        }
+
+        function showAlert(message, type) {
+            const alertDiv = document.getElementById('alert');
+            alertDiv.className = 'alert alert-' + type;
+            alertDiv.textContent = message;
+            alertDiv.classList.remove('d-none');
+            setTimeout(() => { alertDiv.classList.add('d-none'); }, 3000);
+        }
+
+        loadAgents();
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
