@@ -3,140 +3,186 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Pantalla de Ventas - Animación de Felicitación</title>
+    <title>Pantalla de Ventas - Fondo Oscuro y Animación Dorada</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
-        /* Fondo general oscuro */
+        /* ---------- Interfaz con fondo oscuro ---------- */
         body {
             background-color: #111;
+            /* Fondo muy oscuro */
             color: #fff;
+            /* Texto blanco */
             font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
         }
 
-        /* Título principal en dorado */
         h1 {
-            color: #ffcc00;
-            margin: 20px 0;
             text-align: center;
+            margin: 20px 0;
+            color: #ffcc00;
+            /* Dorado */
+            font-size: 2.5rem;
         }
 
-        /* Tabla con fondo gris oscuro y texto blanco */
+        /* Tabla sobre fondo oscuro */
         .table {
             background-color: #333;
+            /* Fondo de la tabla */
             color: #fff;
+            /* Texto blanco */
             margin-bottom: 20px;
+            font-size: 1.3rem;
         }
 
-        /* Encabezado de la tabla en un gris más oscuro y texto dorado */
-        thead th {
+        /* Encabezado más oscuro (#222) y texto dorado (#ffcc00) */
+        .thead-dark th {
             background-color: #222;
             color: #ffcc00;
             text-transform: uppercase;
+            font-size: 1.3rem;
         }
+
+        /* Si prefieres un encabezado un poco diferente, usa .thead-dark en HTML en lugar de .thead-light */
+        /* O ajusta aquí los colores a tu gusto */
 
         td,
         th {
             text-align: center;
             vertical-align: middle;
+            padding: 0.75rem;
         }
 
-        /* Texto del total acumulado en verde y tamaño grande */
+        /* Texto del total acumulado en verde brillante */
         #totalAcumulado {
             color: #00ff00;
-            /* verde brillante */
             font-size: 2rem;
             text-align: center;
             margin-bottom: 30px;
+            font-weight: bold;
         }
 
-        /* --- ANIMACIÓN DE FELICITACIÓN --- */
-
-        /* Overlay que ocupa el 80% de la pantalla */
-        #congratsMessage {
+        /* ---------- Animación de Felicitación (Estilo Dorado/Cobre) ---------- */
+        /* Overlay de pantalla completa */
+        #congratsOverlay {
             display: none;
-            /* Se mostrará dinámicamente */
             position: fixed;
-            top: 10%;
-            left: 10%;
-            width: 80%;
-            height: 80%;
-            background-color: rgba(0, 0, 0, 0.8);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            /* Fondo semi-transparente oscuro */
             z-index: 9999;
-            border-radius: 20px;
-            /* Centramos el texto */
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        /* Texto dentro del overlay: tamaño grande, animación de color */
-        #congratsText {
-            font-size: 6rem;
-            font-weight: bold;
+        /* Contenedor principal con estilo dorado/cobre */
+        .congrats-container {
+            position: relative;
+            width: 500px;
+            max-width: 90%;
+            padding: 2rem;
+            border-radius: 20px;
             text-align: center;
-            text-shadow: 0 0 10px #fff;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            color: #fff;
+            /* Gradiente que simula un estilo metálico */
+            background: linear-gradient(135deg, #4c2100, #8a4b08);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
         }
 
-        /* Animación de fade in/out y escalado en 3s */
-        @keyframes fadeInOut {
+        /* Efecto "estrella" detrás */
+        .starburst {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 200%;
+            height: 200%;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.6) 10%, rgba(255, 255, 255, 0) 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Texto superior: fecha/hora */
+        .congrats-top {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+            color: #ffd700;
+            /* Dorado brillante */
+        }
+
+        /* Nombre del agente */
+        .congrats-agent {
+            font-size: 2.8rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 0 5px #000;
+            color: #fff;
+        }
+
+        /* Monto de la venta */
+        .congrats-amount {
+            font-size: 2.2rem;
+            font-weight: bold;
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            display: inline-block;
+            margin-top: 0.5rem;
+            position: relative;
+            z-index: 1;
+            color: #ffd700;
+            /* Dorado */
+        }
+
+        /* Animaciones de entrada/salida (5s) */
+        @keyframes fadeOverlay {
             0% {
                 opacity: 0;
-                transform: scale(0.5);
             }
 
             10% {
                 opacity: 1;
-                transform: scale(1);
             }
 
             90% {
                 opacity: 1;
-                transform: scale(1);
             }
 
             100% {
                 opacity: 0;
+            }
+        }
+
+        @keyframes scaleInOut {
+            0% {
+                transform: scale(0.5);
+            }
+
+            10% {
+                transform: scale(1);
+            }
+
+            90% {
+                transform: scale(1);
+            }
+
+            100% {
                 transform: scale(0.5);
             }
         }
 
-        .fadeInOut {
-            animation: fadeInOut 3s ease forwards;
-        }
-
-        /* Cambio de color cíclico */
-        @keyframes colorCycle {
-            0% {
-                color: #ff0000;
-            }
-
-            16% {
-                color: #ffff00;
-            }
-
-            33% {
-                color: #00ff00;
-            }
-
-            50% {
-                color: #00ffff;
-            }
-
-            66% {
-                color: #0000ff;
-            }
-
-            83% {
-                color: #ff00ff;
-            }
-
-            100% {
-                color: #ff0000;
-            }
-        }
-
-        .colorCycle {
-            animation: colorCycle 3s linear;
+        .congrats-animate {
+            animation: fadeOverlay 5s ease forwards, scaleInOut 5s ease forwards;
         }
     </style>
 </head>
@@ -145,77 +191,93 @@
     <div class="container-fluid mt-4">
         <h1>Pantalla de Ventas</h1>
         <table class="table table-bordered">
-            <thead>
+            <!-- Cambia a .thead-dark para un encabezado más oscuro y texto dorado -->
+            <thead class="thead-dark">
                 <tr>
                     <th>Agente</th>
                     <th>Target</th>
-                    <th>Valor total de las ventas</th>
                     <th>Ventas del día</th>
                     <th>Ventas de la semana</th>
                     <th>Ventas del mes</th>
+                    <th>Valor total de las ventas</th>
                 </tr>
             </thead>
             <tbody id="televisorTableBody">
-                <!-- Datos dinámicos -->
+                <!-- Se cargarán los agentes dinámicamente -->
             </tbody>
         </table>
-
-        <!-- Texto para mostrar el total acumulado de todos los agentes -->
         <div id="totalAcumulado">Total Acumulado: $0</div>
     </div>
 
-    <!-- Overlay para la animación de felicitación -->
-    <div id="congratsMessage">
-        <span id="congratsText"></span>
+    <!-- Overlay dorado/cobre -->
+    <div id="congratsOverlay">
+        <div class="congrats-container" id="congratsContainer">
+            <div class="starburst"></div>
+            <div class="congrats-top" id="congratsTop"></div>
+            <div class="congrats-agent" id="congratsAgent"></div>
+            <div class="congrats-amount" id="congratsAmount"></div>
+        </div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         let previousAgentsData = [];
 
-        const congratsDiv = document.getElementById('congratsMessage');
-        const congratsText = document.getElementById('congratsText');
+        // Referencias a los elementos
+        const televisorTableBody = document.getElementById('televisorTableBody');
+        const totalAcumuladoDiv = document.getElementById('totalAcumulado');
+        const congratsOverlay = document.getElementById('congratsOverlay');
+        const congratsContainer = document.getElementById('congratsContainer');
+        const congratsTop = document.getElementById('congratsTop');
+        const congratsAgent = document.getElementById('congratsAgent');
+        const congratsAmount = document.getElementById('congratsAmount');
 
-        // Al terminar la animación, se quitan clases y se esconde el overlay
-        congratsDiv.addEventListener('animationend', () => {
-            congratsDiv.style.display = 'none';
-            congratsDiv.classList.remove('fadeInOut');
-            congratsText.classList.remove('colorCycle');
+        // Ocultar overlay al finalizar la animación
+        congratsContainer.addEventListener('animationend', () => {
+            congratsOverlay.style.display = 'none';
+            congratsContainer.classList.remove('congrats-animate');
         });
 
-        // Forzar el cierre del overlay (por si quedó abierto)
+        // Función para ocultar el overlay
         function hideCongratsOverlay() {
-            congratsDiv.style.display = 'none';
-            congratsDiv.classList.remove('fadeInOut');
-            congratsText.classList.remove('colorCycle');
+            congratsOverlay.style.display = 'none';
+            congratsContainer.classList.remove('congrats-animate');
         }
 
-        // Muestra el overlay con animación
-        function showCongratsMessage(agentName) {
-            // Ajusta el texto
-            congratsText.textContent = `¡Felicidades, ${agentName}!`;
-            congratsText.classList.add('colorCycle');
+        // Mostrar la animación dorada/cobre
+        function showCongratsOverlay(agentName, saleAmount) {
+            // Generar fecha/hora
+            const now = new Date();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hour = String(now.getHours()).padStart(2, '0');
+            const min = String(now.getMinutes()).padStart(2, '0');
+            const dateStr = `${day}-${month} ${hour}:${min}`;
 
-            // Muestra el overlay y activa la animación fadeInOut
-            congratsDiv.style.display = 'flex';
-            void congratsDiv.offsetWidth; // Forzar reflow
-            congratsDiv.classList.add('fadeInOut');
+            // Ajustar texto
+            congratsTop.textContent = `Deposit ${dateStr}`;
+            congratsAgent.textContent = agentName;
+            congratsAmount.textContent = `${saleAmount.toFixed(2)} USD`;
 
-            // Fallback por si animationend no se dispara
+            // Mostrar overlay con animación
+            congratsOverlay.style.display = 'flex';
+            void congratsContainer.offsetWidth;
+            congratsContainer.classList.add('congrats-animate');
+
+            // Fallback: ocultar overlay tras 5.5 segundos
             setTimeout(() => {
                 hideCongratsOverlay();
-            }, 3500);
+            }, 5500);
         }
 
         async function loadTelevisorData() {
             try {
-                // 1. Forzar el cierre del overlay al iniciar la actualización
-                hideCongratsOverlay();
-
-                // 2. Petición al backend para obtener la lista de agentes
+                hideCongratsOverlay(); // Ocultamos overlay al iniciar
                 const response = await fetch('http://localhost:3000/agents');
-                let agents = await response.json();
+                const agents = await response.json();
 
-                // Ordenar por ventas mensuales, y si empatan, por moneyMonthly
+                // Ordenar agentes por ventas del mes; si empatan, por moneyMonthly
                 agents.sort((a, b) => {
                     const diffSales = b.sales.monthly - a.sales.monthly;
                     if (diffSales === 0) {
@@ -224,16 +286,16 @@
                     return diffSales;
                 });
 
-                const tableBody = document.getElementById('televisorTableBody');
-                tableBody.innerHTML = '';
-
+                televisorTableBody.innerHTML = '';
                 let totalAcumulado = 0;
-                agents.forEach(agent => {
-                    const prev = previousAgentsData.find(a => a._id === agent._id);
 
+                agents.forEach(agent => {
                     // Detectar incremento en ventas mensuales
+                    const prev = previousAgentsData.find(a => a._id === agent._id);
                     if (prev && agent.sales.monthly > prev.sales.monthly) {
-                        showCongratsMessage(agent.name);
+                        // Monto de la venta = diferencia en moneyMonthly
+                        const saleAmount = (agent.moneyMonthly || 0) - (prev.moneyMonthly || 0);
+                        showCongratsOverlay(agent.name, saleAmount);
                     }
 
                     totalAcumulado += agent.moneyMonthly || 0;
@@ -242,28 +304,25 @@
                     tr.innerHTML = `
             <td>${agent.name}</td>
             <td>${agent.target}</td>
-            <td>$${(agent.moneyMonthly || 0).toLocaleString()}</td>
             <td>${agent.sales.daily}</td>
             <td>${agent.sales.weekly}</td>
             <td>${agent.sales.monthly}</td>
+            <td>$${(agent.moneyMonthly || 0).toLocaleString()}</td>
           `;
-                    tableBody.appendChild(tr);
+                    televisorTableBody.appendChild(tr);
                 });
 
-                document.getElementById('totalAcumulado').textContent =
-                    "Total Acumulado: $" + totalAcumulado.toLocaleString();
-
+                totalAcumuladoDiv.textContent = "Total Acumulado: $" + totalAcumulado.toLocaleString();
                 previousAgentsData = agents;
             } catch (error) {
                 console.error('Error al cargar datos del televisor:', error);
             }
         }
 
+        // Carga inicial y actualización cada 5 segundos
         loadTelevisorData();
         setInterval(loadTelevisorData, 5000);
     </script>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>
