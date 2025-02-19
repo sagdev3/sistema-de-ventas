@@ -55,7 +55,9 @@ exports.subtractSale = async (req, res) => {
     const sale = await Sale.findById(saleId);
     if (!sale) return res.status(404).json({ message: 'Venta no encontrada' });
     const agentId = sale.agent;
-    await sale.remove();
+    
+    // Usamos deleteOne() en lugar de remove()
+    await sale.deleteOne();
 
     const agent = await Agent.findById(agentId);
     if (!agent) return res.status(404).json({ message: 'Agente no encontrado' });
@@ -66,9 +68,12 @@ exports.subtractSale = async (req, res) => {
     await agent.save();
     res.status(200).json({ message: 'Venta restada exitosamente', agent });
   } catch (error) {
+    console.error("Error en subtractSale:", error);
     res.status(500).json({ error: error.message });
   }
 };
+
+
 
 // Reiniciar contadores (si es monthly, también reinicia moneyMonthly)
 exports.cleanCounters = async (req, res) => {

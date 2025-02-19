@@ -3,65 +3,262 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Televisor - Sistema de Ventas</title>
+    <title>Pantalla de Ventas - Animación de Felicitación</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
+        /* Fondo general oscuro */
         body {
-            background-color: #000;
+            background-color: #111;
             color: #fff;
+            font-family: Arial, sans-serif;
         }
 
+        /* Título principal en dorado */
+        h1 {
+            color: #ffcc00;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        /* Tabla con fondo gris oscuro y texto blanco */
         .table {
-            background-color: rgba(255, 255, 255, 0.1);
+            background-color: #333;
+            color: #fff;
+            margin-bottom: 20px;
         }
 
-        .thead-dark {
-            background-color: #333;
+        /* Encabezado de la tabla en un gris más oscuro y texto dorado */
+        thead th {
+            background-color: #222;
+            color: #ffcc00;
+            text-transform: uppercase;
+        }
+
+        td,
+        th {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        /* Texto del total acumulado en verde y tamaño grande */
+        #totalAcumulado {
+            color: #00ff00;
+            /* verde brillante */
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        /* --- ANIMACIÓN DE FELICITACIÓN --- */
+
+        /* Overlay que ocupa el 80% de la pantalla */
+        #congratsMessage {
+            display: none;
+            /* Se mostrará dinámicamente */
+            position: fixed;
+            top: 10%;
+            left: 10%;
+            width: 80%;
+            height: 80%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 9999;
+            border-radius: 20px;
+            /* Centramos el texto */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Texto dentro del overlay: tamaño grande, animación de color */
+        #congratsText {
+            font-size: 6rem;
+            font-weight: bold;
+            text-align: center;
+            text-shadow: 0 0 10px #fff;
+        }
+
+        /* Animación de fade in/out y escalado en 3s */
+        @keyframes fadeInOut {
+            0% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+
+            10% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            90% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            100% {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+        }
+
+        .fadeInOut {
+            animation: fadeInOut 3s ease forwards;
+        }
+
+        /* Cambio de color cíclico */
+        @keyframes colorCycle {
+            0% {
+                color: #ff0000;
+            }
+
+            16% {
+                color: #ffff00;
+            }
+
+            33% {
+                color: #00ff00;
+            }
+
+            50% {
+                color: #00ffff;
+            }
+
+            66% {
+                color: #0000ff;
+            }
+
+            83% {
+                color: #ff00ff;
+            }
+
+            100% {
+                color: #ff0000;
+            }
+        }
+
+        .colorCycle {
+            animation: colorCycle 3s linear;
         }
     </style>
 </head>
 
 <body>
     <div class="container-fluid mt-4">
-        <h1 class="text-center">Ventas en Tiempo Real</h1>
-        <table class="table table-bordered mt-4">
-            <thead class="thead-dark">
+        <h1>Pantalla de Ventas</h1>
+        <table class="table table-bordered">
+            <thead>
                 <tr>
                     <th>Agente</th>
-                    <th>Ventas Diarias</th>
-                    <th>Ventas Semanales</th>
-                    <th>Ventas Mensuales</th>
                     <th>Target</th>
+                    <th>Valor total de las ventas</th>
+                    <th>Ventas del día</th>
+                    <th>Ventas de la semana</th>
+                    <th>Ventas del mes</th>
                 </tr>
             </thead>
             <tbody id="televisorTableBody">
-                <!-- Datos cargados dinámicamente -->
+                <!-- Datos dinámicos -->
             </tbody>
         </table>
+
+        <!-- Texto para mostrar el total acumulado de todos los agentes -->
+        <div id="totalAcumulado">Total Acumulado: $0</div>
     </div>
+
+    <!-- Overlay para la animación de felicitación -->
+    <div id="congratsMessage">
+        <span id="congratsText"></span>
+    </div>
+
     <script>
+        let previousAgentsData = [];
+
+        const congratsDiv = document.getElementById('congratsMessage');
+        const congratsText = document.getElementById('congratsText');
+
+        // Al terminar la animación, se quitan clases y se esconde el overlay
+        congratsDiv.addEventListener('animationend', () => {
+            congratsDiv.style.display = 'none';
+            congratsDiv.classList.remove('fadeInOut');
+            congratsText.classList.remove('colorCycle');
+        });
+
+        // Forzar el cierre del overlay (por si quedó abierto)
+        function hideCongratsOverlay() {
+            congratsDiv.style.display = 'none';
+            congratsDiv.classList.remove('fadeInOut');
+            congratsText.classList.remove('colorCycle');
+        }
+
+        // Muestra el overlay con animación
+        function showCongratsMessage(agentName) {
+            // Ajusta el texto
+            congratsText.textContent = `¡Felicidades, ${agentName}!`;
+            congratsText.classList.add('colorCycle');
+
+            // Muestra el overlay y activa la animación fadeInOut
+            congratsDiv.style.display = 'flex';
+            void congratsDiv.offsetWidth; // Forzar reflow
+            congratsDiv.classList.add('fadeInOut');
+
+            // Fallback por si animationend no se dispara
+            setTimeout(() => {
+                hideCongratsOverlay();
+            }, 3500);
+        }
+
         async function loadTelevisorData() {
             try {
+                // 1. Forzar el cierre del overlay al iniciar la actualización
+                hideCongratsOverlay();
+
+                // 2. Petición al backend para obtener la lista de agentes
                 const response = await fetch('http://localhost:3000/agents');
-                const agents = await response.json();
+                let agents = await response.json();
+
+                // Ordenar por ventas mensuales, y si empatan, por moneyMonthly
+                agents.sort((a, b) => {
+                    const diffSales = b.sales.monthly - a.sales.monthly;
+                    if (diffSales === 0) {
+                        return (b.moneyMonthly || 0) - (a.moneyMonthly || 0);
+                    }
+                    return diffSales;
+                });
+
                 const tableBody = document.getElementById('televisorTableBody');
                 tableBody.innerHTML = '';
+
+                let totalAcumulado = 0;
                 agents.forEach(agent => {
+                    const prev = previousAgentsData.find(a => a._id === agent._id);
+
+                    // Detectar incremento en ventas mensuales
+                    if (prev && agent.sales.monthly > prev.sales.monthly) {
+                        showCongratsMessage(agent.name);
+                    }
+
+                    totalAcumulado += agent.moneyMonthly || 0;
+
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
             <td>${agent.name}</td>
-            <td>$${agent.sales.daily}</td>
-            <td>$${agent.sales.weekly}</td>
-            <td>$${agent.sales.monthly}</td>
-            <td>$${agent.target}</td>
+            <td>${agent.target}</td>
+            <td>$${(agent.moneyMonthly || 0).toLocaleString()}</td>
+            <td>${agent.sales.daily}</td>
+            <td>${agent.sales.weekly}</td>
+            <td>${agent.sales.monthly}</td>
           `;
                     tableBody.appendChild(tr);
                 });
+
+                document.getElementById('totalAcumulado').textContent =
+                    "Total Acumulado: $" + totalAcumulado.toLocaleString();
+
+                previousAgentsData = agents;
             } catch (error) {
                 console.error('Error al cargar datos del televisor:', error);
             }
         }
-        // Actualizar la vista cada 5 segundos para simular tiempo real
+
         loadTelevisorData();
         setInterval(loadTelevisorData, 5000);
     </script>
