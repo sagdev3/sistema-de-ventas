@@ -159,29 +159,32 @@
     </div>
 
     <script>
+        // Carga inicial de agentes
         async function loadAgents() {
             try {
                 const response = await fetch('http://localhost:3000/agents');
                 const agents = await response.json();
                 const tableBody = document.getElementById('agentTableBody');
                 tableBody.innerHTML = '';
+
                 agents.forEach(agent => {
+                    // Se muestran los datos tal cual
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-            <td>${agent.name}</td>
-            <td>${agent.email || ''}</td>
-            <td>${agent.sales.daily}</td>
-            <td>${agent.sales.weekly}</td>
-            <td>${agent.sales.monthly}</td>
-            <td>${agent.target}</td>
-            <td>${agent.moneyMonthly ? agent.moneyMonthly.toFixed(2) : "0.00"}</td>
-            <td>
-              <button class="btn btn-sm btn-success" onclick="openSaleModal('${agent._id}')">Registrar Venta</button>
-              <button class="btn btn-sm btn-warning" onclick="openSubtractModal('${agent._id}')">Restar Venta</button>
-              <button class="btn btn-sm btn-secondary" onclick="openEditModal('${agent._id}', '${agent.name}', '${agent.email}', '${agent.target}')">Editar</button>
-              <button class="btn btn-sm btn-danger" onclick="deleteAgent('${agent._id}')">Eliminar</button>
-            </td>
-          `;
+                        <td>${agent.name}</td>
+                        <td>${agent.email || ''}</td>
+                        <td>${agent.sales.daily}</td>
+                        <td>${agent.sales.weekly}</td>
+                        <td>${agent.sales.monthly}</td>
+                        <td>${agent.target}</td>
+                        <td>${agent.moneyMonthly ? agent.moneyMonthly.toFixed(2) : "0.00"}</td>
+                        <td>
+                            <button class="btn btn-sm btn-success" onclick="openSaleModal('${agent._id}')">Registrar Venta</button>
+                            <button class="btn btn-sm btn-warning" onclick="openSubtractModal('${agent._id}')">Restar Venta</button>
+                            <button class="btn btn-sm btn-secondary" onclick="openEditModal('${agent._id}', '${agent.name}', '${agent.email}', '${agent.target}')">Editar</button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteAgent('${agent._id}')">Eliminar</button>
+                        </td>
+                    `;
                     tableBody.appendChild(tr);
                 });
             } catch (error) {
@@ -189,12 +192,44 @@
             }
         }
 
+        // Funciones para abrir modales
         function openSaleModal(agentId) {
             document.getElementById('saleAgentId').value = agentId;
             document.getElementById('saleAmount').value = "";
             $('#saleModal').modal('show');
         }
 
+        async function openSubtractModal(agentId) {
+            try {
+                const now = new Date();
+                const month = now.getMonth() + 1;
+                const year = now.getFullYear();
+                const response = await fetch(`http://localhost:3000/sales/agent/${agentId}?month=${month}&year=${year}`);
+                const sales = await response.json();
+                const salesListBody = document.getElementById('salesListBody');
+                salesListBody.innerHTML = '';
+                if (sales.length === 0) {
+                    salesListBody.innerHTML = '<tr><td colspan="3">No hay ventas registradas para este mes.</td></tr>';
+                } else {
+                    sales.forEach(sale => {
+                        const tr = document.createElement('tr');
+                        const saleDate = new Date(sale.date).toLocaleDateString();
+                        tr.innerHTML = `
+                            <td>${saleDate}</td>
+                            <td>${sale.amount.toFixed(2)}</td>
+                            <td><button class="btn btn-sm btn-danger" onclick="subtractSale('${sale._id}')">Restar</button></td>
+                        `;
+                        salesListBody.appendChild(tr);
+                    });
+                }
+                $('#subtractSaleModal').modal('show');
+            } catch (error) {
+                showAlert('Error al cargar ventas', 'danger');
+                console.error('Error al cargar ventas:', error);
+            }
+        }
+
+        // Registrar venta
         document.getElementById('saveSaleButton').addEventListener('click', async function () {
             const agentId = document.getElementById('saleAgentId').value;
             const amount = parseFloat(document.getElementById('saleAmount').value);
@@ -221,36 +256,7 @@
             }
         });
 
-        async function openSubtractModal(agentId) {
-            try {
-                const now = new Date();
-                const month = now.getMonth() + 1;
-                const year = now.getFullYear();
-                const response = await fetch(`http://localhost:3000/sales/agent/${agentId}?month=${month}&year=${year}`);
-                const sales = await response.json();
-                const salesListBody = document.getElementById('salesListBody');
-                salesListBody.innerHTML = '';
-                if (sales.length === 0) {
-                    salesListBody.innerHTML = '<tr><td colspan="3">No hay ventas registradas para este mes.</td></tr>';
-                } else {
-                    sales.forEach(sale => {
-                        const tr = document.createElement('tr');
-                        const saleDate = new Date(sale.date).toLocaleDateString();
-                        tr.innerHTML = `
-              <td>${saleDate}</td>
-              <td>${sale.amount.toFixed(2)}</td>
-              <td><button class="btn btn-sm btn-danger" onclick="subtractSale('${sale._id}')">Restar</button></td>
-            `;
-                        salesListBody.appendChild(tr);
-                    });
-                }
-                $('#subtractSaleModal').modal('show');
-            } catch (error) {
-                showAlert('Error al cargar ventas', 'danger');
-                console.error('Error al cargar ventas:', error);
-            }
-        }
-
+        // Restar venta
         async function subtractSale(saleId) {
             try {
                 const response = await fetch('http://localhost:3000/sales/subtract', {
@@ -271,6 +277,7 @@
             }
         }
 
+        // Agregar agente (inline form)
         document.getElementById('addAgentForm').addEventListener('submit', async function (e) {
             e.preventDefault();
             const name = document.getElementById('agentName').value;
@@ -295,6 +302,7 @@
             }
         });
 
+        // Editar agente
         function openEditModal(id, name, email, target) {
             document.getElementById('editAgentId').value = id;
             document.getElementById('editAgentName').value = name;
@@ -327,6 +335,7 @@
             }
         });
 
+        // Eliminar agente
         async function deleteAgent(id) {
             if (!confirm('¿Estás seguro de eliminar este agente?')) return;
             try {
@@ -343,14 +352,18 @@
             }
         }
 
+        // Mostrar alertas
         function showAlert(message, type) {
             const alertDiv = document.getElementById('alert');
             alertDiv.className = 'alert alert-' + type;
             alertDiv.textContent = message;
             alertDiv.classList.remove('d-none');
-            setTimeout(() => { alertDiv.classList.add('d-none'); }, 3000);
+            setTimeout(() => {
+                alertDiv.classList.add('d-none');
+            }, 3000);
         }
 
+        // Cargar agentes al inicio
         loadAgents();
     </script>
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
