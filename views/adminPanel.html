@@ -162,7 +162,7 @@
         // Carga inicial de agentes
         async function loadAgents() {
             try {
-                const response = await fetch('https://sistema-de-ventas-u9aj.onrender.com/agents');
+                const response = await fetch('https://sistema-de-ventas-se3p.onrender.com/agents');
                 const agents = await response.json();
                 const tableBody = document.getElementById('agentTableBody');
                 tableBody.innerHTML = '';
@@ -204,7 +204,7 @@
                 const now = new Date();
                 const month = now.getMonth() + 1;
                 const year = now.getFullYear();
-                const response = await fetch(`https://sistema-de-ventas-u9aj.onrender.com/sales/agent/${agentId}?month=${month}&year=${year}`);
+                const response = await fetch(`https://sistema-de-ventas-se3p.onrender.com/sales/agent/${agentId}?month=${month}&year=${year}`);
                 const sales = await response.json();
                 const salesListBody = document.getElementById('salesListBody');
                 salesListBody.innerHTML = '';
@@ -238,7 +238,7 @@
                 return;
             }
             try {
-                const response = await fetch('https://sistema-de-ventas-u9aj.onrender.com/sales', {
+                const response = await fetch('https://sistema-de-ventas-se3p.onrender.com/sales', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ agentId, amount })
@@ -259,7 +259,7 @@
         // Restar venta
         async function subtractSale(saleId) {
             try {
-                const response = await fetch('https://sistema-de-ventas-u9aj.onrender.com/sales/subtract', {
+                const response = await fetch('https://sistema-de-ventas-se3p.onrender.com/sales/subtract', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ saleId })
@@ -284,7 +284,7 @@
             const email = document.getElementById('agentEmail').value;
             const target = document.getElementById('agentTarget').value;
             try {
-                const response = await fetch('https://sistema-de-ventas-u9aj.onrender.com/agents', {
+                const response = await fetch('https://sistema-de-ventas-se3p.onrender.com/agents', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, email, target })
@@ -317,7 +317,7 @@
             const email = document.getElementById('editAgentEmail').value;
             const target = document.getElementById('editAgentTarget').value;
             try {
-                const response = await fetch('https://sistema-de-ventas-u9aj.onrender.com/agents/' + id, {
+                const response = await fetch('https://sistema-de-ventas-se3p.onrender.com/agents/' + id, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, email, target })
@@ -339,7 +339,7 @@
         async function deleteAgent(id) {
             if (!confirm('¿Estás seguro de eliminar este agente?')) return;
             try {
-                const response = await fetch('https://sistema-de-ventas-u9aj.onrender.com/agents/' + id, { method: 'DELETE' });
+                const response = await fetch('https://sistema-de-ventas-se3p.onrender.com/agents/' + id, { method: 'DELETE' });
                 if (response.ok) {
                     showAlert('Agente eliminado exitosamente', 'success');
                     loadAgents();
