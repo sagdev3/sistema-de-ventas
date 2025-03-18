@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: sistema-de-ventas
+    env: node
+    buildCommand: "npm install"
+    startCommand: "node server.js"
+    envVars:
+      - key: MONGO_URI
+        value: "mongodb+srv://izzysolutions:Izzy2025@cluster0.jh5lq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+      - key: PORT
+        value: "3000"
