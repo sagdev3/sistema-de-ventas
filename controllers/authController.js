@@ -4,8 +4,9 @@ const saltRounds = 10;
 
 const allowedCodes = [
   { code: "ABC1234", expires_on: new Date("2025-12-31T23:59:59Z"), used: false },
-  { code: "XYZ9876", expires_on: new Date("2025-12-31T23:59:59Z"), used: false }
-  { code: "1234ABC", expires_on: new Date("2025-12-31T23:59:59Z"), used: false }
+  { code: "XYZ9876", expires_on: new Date("2025-12-31T23:59:59Z"), used: false },
+  { code: "1234ABC", expires_on: new Date("2025-12-31T23:59:59Z"), used: false },
+  { code: "XYZ1234", expires_on: new Date("2025-12-31T23:59:59Z"), used: false }
 ];
 
 exports.registerLeader = async (req, res) => {
